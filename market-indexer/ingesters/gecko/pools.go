@@ -12,6 +12,7 @@ import (
 
 	"go.uber.org/zap"
 
+	"github.com/skip-mev/connect-mmu/lib/http"
 	"github.com/skip-mev/connect-mmu/lib/symbols"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/types"
 )
@@ -110,7 +111,7 @@ type PoolsResponse struct {
 	Data []PoolData `json:"data"`
 }
 
-const maxPages = 10
+const maxPages = 30
 
 func (c *geckoClientImpl) TopPools(ctx context.Context, network, dex string, page int) (*PoolsResponse, error) {
 	if network == "" {
@@ -124,7 +125,13 @@ func (c *geckoClientImpl) TopPools(ctx context.Context, network, dex string, pag
 	}
 	endpoint := fmt.Sprintf("%s/networks/%s/dexes/%s/pools?page=%d", c.baseEndpoint, network, dex, page)
 	c.logger.Debug("getting top pools", zap.String("network", network), zap.String("dex", dex), zap.Int("page", page))
-	resp, err := c.GetWithContext(ctx, endpoint)
+
+	opts := []http.GetOptions{
+		http.WithHeader("x-cg-pro-api-key", c.apiKey),
+		http.WithJSONAccept(),
+	}
+
+	resp, err := c.GetWithContext(ctx, endpoint, opts...)
 	if err != nil {
 		return nil, fmt.Errorf("gecko geckoClientImpl: failed to fetch TopPools: %w", err)
 	}
@@ -147,6 +154,10 @@ func (p *PoolData) QuoteVolume() (*big.Float, error) {
 	priceInUSD, ok := new(big.Float).SetString(p.Attributes.QuoteTokenPriceUsd)
 	if !ok {
 		return nil, fmt.Errorf("unable to convert QuoteTokenPriceUsd to big.Float: %s", p.Attributes.QuoteTokenPriceUsd)
+	}
+
+	if h24VolUSD.Sign() == 0 || priceInUSD.Sign() == 0 {
+		return big.NewFloat(0), nil
 	}
 
 	quoteVolume := new(big.Float).Quo(h24VolUSD, priceInUSD)
@@ -187,7 +198,21 @@ func (p *PoolData) Venue() string {
 }
 
 func (p *PoolData) VenueAddress() string {
-	return p.Attributes.Address
+	baseOffChain := strings.Join([]string{
+		geckoDexToConnectTickerVenue(p.Venue()),
+		p.BaseAddress(),
+	}, types.DefiTickerDelimiter)
+
+	quoteOffChain := strings.Join([]string{
+		geckoDexToConnectTickerVenue(p.Venue()),
+		p.QuoteAddress(),
+	}, types.DefiTickerDelimiter)
+
+	return strings.ToUpper(strings.Join([]string{
+		p.Attributes.Address,
+		baseOffChain,
+		quoteOffChain,
+	}, types.TickerSeparator))
 }
 
 // Base returns the properly formated base symbol.
@@ -250,21 +275,9 @@ func (p *PoolData) OffChainTicker() (string, error) {
 		return "", err
 	}
 
-	targetBaseOffchain := strings.Join([]string{
-		targetBase,
-		geckoDexToConnectTickerVenue(p.Venue()),
-		p.BaseAddress(),
-	}, types.DefiTickerDelimiter)
-
-	targetQuoteOffchain := strings.Join([]string{
-		targetQuote,
-		geckoDexToConnectTickerVenue(p.Venue()),
-		p.QuoteAddress(),
-	}, types.DefiTickerDelimiter)
-
 	return strings.ToUpper(strings.Join([]string{
-		targetBaseOffchain,
-		targetQuoteOffchain,
+		targetBase,
+		targetQuote,
 	}, types.TickerSeparator)), nil
 }
 

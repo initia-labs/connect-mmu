@@ -8,11 +8,13 @@ import (
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/coinbase"
 	crypto_com "github.com/skip-mev/connect-mmu/market-indexer/ingesters/crypto.com"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/gate"
+	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/gecko"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/huobi"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/kraken"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/kucoin"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/mexc"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/okx"
+	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/osmosis"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/raydium"
 )
 
@@ -49,6 +51,10 @@ func GetProviderName(name string) string {
 		return okx.ProviderName
 	case raydium.Name:
 		return raydium.ProviderName
+	case gecko.Name:
+		return gecko.ProviderName
+	case osmosis.Name:
+		return osmosis.ProviderName
 	default:
 		return nameUnknown
 	}

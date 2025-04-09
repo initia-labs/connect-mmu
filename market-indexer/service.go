@@ -23,6 +23,7 @@ import (
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/kucoin"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/mexc"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/okx"
+	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/osmosis"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/raydium"
 	"github.com/skip-mev/connect-mmu/market-indexer/utils"
 	"github.com/skip-mev/connect-mmu/store/provider"
@@ -92,6 +93,8 @@ func NewIndexer(cfg config.MarketConfig, logger *zap.Logger, writer provider.Sto
 			igs[i] = raydium.New(logger, cfg)
 		case gecko.Name:
 			igs[i] = gecko.New(logger, cfg)
+		case osmosis.Name:
+			igs[i] = osmosis.New(logger, cfg)
 		default:
 			return nil, fmt.Errorf("provider %s is unsupported", ingestConfig.Name)
 		}

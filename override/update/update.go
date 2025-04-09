@@ -77,8 +77,8 @@ func CombineMarketMaps(
 				zap.String("ticker", ticker),
 			)
 
-			// if not found in the on chain marketmap, add, but disable
-			market.Ticker.Enabled = false
+			// if not found in the on chain marketmap, add
+			market.Ticker.Enabled = true
 		}
 		combined.Markets[ticker] = market
 	}

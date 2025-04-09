@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/types"
 	"strings"
 
 	"github.com/skip-mev/connect/v2/providers/apis/defi/uniswapv3"
@@ -16,7 +17,8 @@ import (
 )
 
 const (
-	Name = "gecko"
+	Name         = "gecko_terminal"
+	ProviderName = Name + types.ProviderNameSuffixAPI
 )
 
 var _ ingesters.Ingester = &Ingester{}
@@ -36,7 +38,7 @@ func New(logger *zap.Logger, marketConfig config.MarketConfig) *Ingester {
 	ing := &Ingester{
 		logger: logger.With(zap.String("ingester", Name)),
 		pairs:  marketConfig.GeckoNetworkDexPairs,
-		client: newClient(logger, BaseEndpoint),
+		client: newClient(logger, BaseEndpoint, marketConfig.CoinGeckoConfig.APIKey),
 	}
 	return ing
 }
@@ -53,6 +55,7 @@ func (ig *Ingester) GetProviderMarkets(ctx context.Context) ([]provider.CreatePr
 	// for each network+dex pair:
 	for _, pair := range ig.pairs {
 		// get the top pools in that network + dex.
+		pair.Dex = ConvertDexName(pair.Dex)
 		pools, err := ig.topPools(ctx, pair.Network, pair.Dex)
 		if err != nil {
 			return nil, err
@@ -122,7 +125,8 @@ func (ig *Ingester) GetProviderMarkets(ctx context.Context) ([]provider.CreatePr
 			}
 			refPrice, err := pool.ReferencePrice()
 			if err != nil {
-				return nil, err
+				ig.logger.Debug("failed to get reference price for pool", zap.Error(err))
+				continue
 			}
 
 			targetBase, err := pool.Base()
@@ -148,7 +152,7 @@ func (ig *Ingester) GetProviderMarkets(ctx context.Context) ([]provider.CreatePr
 					TargetBase:     targetBase,
 					TargetQuote:    targetQuote,
 					OffChainTicker: offChainTicker,
-					ProviderName:   geckoDexToConnectDex(pool.Venue()),
+					ProviderName:   ProviderName,
 					QuoteVolume:    quoteVolF64,
 					MetadataJSON:   metaDataBz,
 					ReferencePrice: refPrice,

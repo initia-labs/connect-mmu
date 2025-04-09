@@ -33,22 +33,32 @@ func validatePairs(pairs []config.GeckoNetworkDexPair) error {
 }
 
 const (
-	ProviderNameUniswapEth  = "uniswapv3_api-ethereum"
-	ProviderNameUniswapBase = "uniswapv3_api-base"
+	ProviderNameUniswapEth   = "uniswapv3_api-ethereum"
+	ProviderNameUniswapEthV4 = "uniswapv4_api-ethereum"
+	ProviderNameUniswapBase  = "uniswapv3_api-base"
+	ProviderNameCurve        = "curve-finance"
 
-	TickerVenueUniswapEth  = "UNISWAP_V3"
-	TickerVenueUniswapBase = "UNISWAP_V3_BASE"
+	TickerVenueUniswapEth   = "UNISWAP_V3"
+	TickerVenueUniswapEthV4 = "UNISWAP_V4"
+	TickerVenueUniswapBase  = "UNISWAP_V3_BASE"
+	TickerVenueCurve        = "CURVE-FINANCE"
 
-	GeckoVenueUniswapEth  = "uniswap_v3"
-	GeckoVenueUniswapBase = "uniswap-v3-base"
+	GeckoVenueUniswapEth   = "uniswap_v3"
+	GeckoVenueUniswapEthV4 = "uniswap-v4"
+	GeckoVenueUniswapBase  = "uniswap-v3-base"
+	GeckoVenueCurve        = "curve-finance"
 )
 
 func geckoDexToConnectDex(dex string) string {
 	switch dex {
 	case GeckoVenueUniswapEth:
 		return ProviderNameUniswapEth
+	case GeckoVenueUniswapEthV4:
+		return ProviderNameUniswapEthV4
 	case GeckoVenueUniswapBase:
 		return ProviderNameUniswapBase
+	case GeckoVenueCurve:
+		return ProviderNameCurve
 	default:
 		return dex
 	}
@@ -58,8 +68,12 @@ func geckoDexToConnectTickerVenue(dex string) string {
 	switch dex {
 	case GeckoVenueUniswapEth:
 		return TickerVenueUniswapEth
+	case GeckoVenueUniswapEthV4:
+		return TickerVenueUniswapEthV4
 	case GeckoVenueUniswapBase:
 		return TickerVenueUniswapBase
+	case GeckoVenueCurve:
+		return TickerVenueCurve
 	default:
 		return dex
 	}
@@ -75,5 +89,7 @@ func isValidFloat64(f float64) bool {
 
 var validPairs = map[config.GeckoNetworkDexPair]struct{}{
 	{Network: "eth", Dex: GeckoVenueUniswapEth}:   {},
+	{Network: "eth", Dex: GeckoVenueUniswapEthV4}: {},
 	{Network: "base", Dex: GeckoVenueUniswapBase}: {},
+	{Network: "eth", Dex: GeckoVenueCurve}:        {},
 }

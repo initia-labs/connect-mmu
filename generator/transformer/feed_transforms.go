@@ -12,6 +12,7 @@ import (
 	"golang.org/x/exp/maps"
 
 	"github.com/skip-mev/connect-mmu/config"
+	"github.com/skip-mev/connect-mmu/generator/filter"
 	"github.com/skip-mev/connect-mmu/generator/types"
 )
 
@@ -380,6 +381,12 @@ func getHighestRankFeedGroup(feedGroups map[string]types.Feeds) (string, error) 
 		}
 
 		feed := group[0]
+
+		// in case of milkTIA
+		skipList := filter.GetSkipList()
+		if skipList[feed.TickerString()] {
+			bestGroup = groupID
+		}
 
 		// if we don't have ranking info, don't consider
 		if !feed.CMCInfo.HasRank() {

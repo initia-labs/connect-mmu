@@ -1,0 +1,294 @@
+{
+  "index": {
+    "ingesters": [
+      { "name": "binance" },
+      { "name": "bitfinex" },
+      { "name": "bitstamp" },
+      { "name": "bybit" },
+      { "name": "coinbase" },
+      { "name": "crypto_dot_com" },
+      { "name": "gate" },
+      { "name": "huobi" },
+      { "name": "kraken" },
+      { "name": "kucoin" },
+      { "name": "okx" },
+      { "name": "mexc" },
+      { "name": "gecko_terminal" },
+      { "name": "osmosis" }
+    ],
+    "coinmarketcap": { "api_key": "" },
+    "coingecko": {"api_key": ""},
+    "raydium": null,
+    "gecko_network_dex_pairs": [
+      { "network": "eth", "dex": "uniswap_v3" }
+    ]
+  },
+  "generate": {
+    "providers": {
+      "binance_ws": {
+        "isSupplemental": false,
+        "require_aggregate_ids": false,
+        "filters": { "top_markets": 0 },
+        "ignore_liquidity": false,
+        "ignore_volume": true
+      },
+      "bybit_ws": {
+        "isSupplemental": false,
+        "require_aggregate_ids": false,
+        "filters": { "top_markets": 0 },
+        "ignore_liquidity": false,
+        "ignore_volume": true
+      },
+      "kraken_api": {
+        "isSupplemental": false,
+        "require_aggregate_ids": false,
+        "filters": { "top_markets": 0 },
+        "ignore_liquidity": false,
+        "ignore_volume": true
+      },
+      "bitfinex_ws": {
+        "isSupplemental": false,
+        "require_aggregate_ids": false,
+        "filters": { "top_markets": 100 },
+        "ignore_liquidity": false,
+        "ignore_volume": false
+      },
+      "bitstamp_api": {
+        "isSupplemental": false,
+        "require_aggregate_ids": false,
+        "filters": { "top_markets": 100 },
+        "ignore_liquidity": false,
+        "ignore_volume": false
+      },
+      "coinbase_ws": {
+        "isSupplemental": false,
+        "require_aggregate_ids": false,
+        "filters": { "top_markets": 100 },
+        "ignore_liquidity": false,
+        "ignore_volume": false
+      },
+      "crypto_dot_com_ws": {
+        "isSupplemental": false,
+        "require_aggregate_ids": false,
+        "filters": { "top_markets": 100 },
+        "ignore_liquidity": false,
+        "ignore_volume": false
+      },
+      "gate_ws": {
+        "isSupplemental": false,
+        "require_aggregate_ids": false,
+        "filters": { "top_markets": 0 },
+        "ignore_liquidity": false,
+        "ignore_volume": true
+      },
+      "huobi_ws": {
+        "isSupplemental": false,
+        "require_aggregate_ids": false,
+        "filters": { "top_markets": 100 },
+        "ignore_liquidity": false,
+        "ignore_volume": false
+      },
+      "kucoin_ws": {
+        "isSupplemental": false,
+        "require_aggregate_ids": false,
+        "filters": { "top_markets": 100 },
+        "ignore_liquidity": false,
+        "ignore_volume": false
+      },
+      "okx_ws": {
+        "isSupplemental": false,
+        "require_aggregate_ids": false,
+        "filters": { "top_markets": 100 },
+        "ignore_liquidity": false,
+        "ignore_volume": false
+      },
+      "raydium_api": {
+        "isSupplemental": false,
+        "require_aggregate_ids": false,
+        "filters": { "top_markets": 50 },
+        "ignore_liquidity": true,
+        "ignore_volume": false,
+        "is_defi": true
+      },
+      "uniswapv3_api-base": {
+        "isSupplemental": false,
+        "require_aggregate_ids": false,
+        "filters": { "top_markets": 50 },
+        "ignore_liquidity": true,
+        "ignore_volume": false,
+        "is_defi": true
+      },
+      "uniswapv3_api-ethereum": {
+        "isSupplemental": false,
+        "require_aggregate_ids": false,
+        "filters": { "top_markets": 0 },
+        "ignore_liquidity": true,
+        "ignore_volume": false,
+        "is_defi": true
+      },
+      "mexc_ws": {
+        "isSupplemental": false,
+        "require_aggregate_ids": false,
+        "filters": { "top_markets": 0 },
+        "ignore_liquidity": false,
+        "ignore_volume": true
+      },
+      "osmosis_api": {
+        "isSupplemental": false,
+        "require_aggregate_ids": false,
+        "filters": { "top_markets": 50 },
+        "ignore_liquidity": true,
+        "ignore_volume": false,
+        "is_defi": true
+      },
+      "gecko_terminal_api": {
+        "isSupplemental": false,
+        "require_aggregate_ids": false,
+        "filters": { "top_markets": 0 },
+        "ignore_liquidity": true,
+        "ignore_volume": true,
+        "is_defi": false
+      }
+    },
+    "quotes": {
+      "USD": {
+        "min_provider_volume":5000,
+        "min_provider_liquidity": 1000
+      },
+      "USDT": {
+        "min_provider_volume": 5000,
+        "min_provider_liquidity": 1000,
+        "normalize_by_pair": "USDT/USD"
+      },
+      "USDC": {
+        "min_provider_volume": 5000,
+        "min_provider_liquidity": 1000,
+        "normalize_by_pair": "USDC/USD"
+      },
+      "BTC": {
+        "min_provider_volume": 15,
+        "min_provider_liquidity": 1000,
+        "normalize_by_pair": "BTC/USD"
+      },
+      "ETH": {
+        "min_provider_volume": 20,
+        "min_provider_liquidity": 1000,
+        "normalize_by_pair": "ETH/USD"
+      },
+      "WETH": {
+        "min_provider_volume": 5,
+        "min_provider_liquidity": 1000,
+        "normalize_by_pair": "ETH/USD"
+      },
+      "WBTC": {
+        "min_provider_volume": 5,
+        "min_provider_liquidity": 1000,
+        "normalize_by_pair": "BTC/USD"
+      },
+      "SOL": {
+        "min_provider_volume": 10,
+        "min_provider_liquidity": 1000,
+        "normalize_by_pair": "SOL/USD"
+      },
+      "TIA": {
+        "min_provider_volume": 10,
+        "min_provider_liquidity": 1000,
+        "normalize_by_pair": "TIA/USD"
+      }
+    },
+    "min_cex_provider_count": 1,
+    "min_dex_provider_count": 1,
+    "disable_providers": null,
+    "exclude_pairs": {
+      "AGLD/USD": {},
+      "AUD/USD": {},
+      "CAD/USD": {},
+      "CNY/USD": {},
+      "GBP/USD": {},
+      "JPY/USD": {},
+      "MXN/USD": {},
+      "NZD/USD": {}
+    },
+    "allowed_currency_pairs": null,
+    "market_map_override": {
+      "markets": {
+        "USDT/USD": {
+          "ticker": {
+            "enabled": true,
+            "currency_pair": { "Base": "USDT", "Quote": "USD" },
+            "decimals": 9,
+            "min_provider_count": 3,
+            "metadata_JSON": "{\"reference_price\":9994500000,\"liquidity\":16115110,\"aggregate_ids\":[{\"venue\":\"coinmarketcap\",\"ID\":\"3853\"}]}"
+          },
+          "provider_configs": [
+            {
+              "name": "binance_ws",
+              "off_chain_ticker": "USDCUSDT",
+              "invert": true
+            },
+            {
+              "name": "bybit_ws",
+              "off_chain_ticker": "USDCUSDT",
+              "invert": true
+            },
+            { "name": "coinbase_ws", "off_chain_ticker": "USDT-USD" },
+            {
+              "name": "huobi_ws",
+              "off_chain_ticker": "ethusdt",
+              "normalize_by_pair": { "Base": "ETH", "Quote": "USD" },
+              "invert": true
+            },
+            { "name": "kraken_api", "off_chain_ticker": "USDTZUSD" },
+            {
+              "name": "kucoin_ws",
+              "off_chain_ticker": "BTC-USDT",
+              "normalize_by_pair": { "Base": "BTC", "Quote": "USD" },
+              "invert": true
+            },
+            {
+              "name": "okx_ws",
+              "off_chain_ticker": "USDC-USDT",
+              "invert": true
+            },
+            { "name": "crypto_dot_com_ws", "off_chain_ticker": "USDT_USD" }
+          ]
+        }
+      }
+    },
+    "enable_all": true,
+    "min_provider_count_override": 1
+  },
+  "upsert": {
+    "restricted_markets": ["USDT/USD", "ETH/USD", "BTC/USD", "SOL/USD"]
+  },
+  "dispatch": {
+    "tx": {
+      "max_bytes_per_tx": 100000,
+      "max_gas": 900000000,
+      "gas_adjustment": 1.5,
+      "min_gas_price": {
+        "denom": "uinit",
+        "amount": "20000000000.000000000000000000"
+      }
+    },
+    "signing": {
+      "type": "simulate_agent",
+      "config": {
+        "address": "init1xhnq6h3v9mwy8mkezxj0nycvm85fnhnuq9ss23"
+      }
+    },
+    "submitter": {
+      "polling_frequency": 10000000000,
+      "polling_duration": 300000000000
+    }
+  },
+  "chain": {
+    "rpc_address": "http://localhost:26657",
+    "grpc_address": "localhost:9090",
+    "rest_address": "http://localhost:1317",
+    "dydx": false,
+    "chain_id": "testnet",
+    "version": "connect",
+    "prefix": "init"
+  }
+}

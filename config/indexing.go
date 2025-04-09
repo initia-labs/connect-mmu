@@ -7,6 +7,7 @@ import (
 type MarketConfig struct {
 	Ingesters           []IngesterConfig    `json:"ingesters" mapstructure:"ingesters"`
 	CoinMarketCapConfig CoinMarketCapConfig `json:"coinmarketcap" mapstructure:"coinmarketcap"`
+	CoinGeckoConfig     CoinGeckoConfig     `json:"coingecko" mapstructure:"coingecko"`
 	RaydiumNodes        []RaydiumNodeConfig `json:"raydium" mapstructure:"raydium"`
 
 	// GeckoNetworkDexPairs is a configuration for the Gecko Terminal ingester. This configures the ingester to
@@ -53,7 +54,15 @@ type CoinMarketCapConfig struct {
 	APIKey string `json:"api_key" mapstructure:"api_key"`
 }
 
+type CoinGeckoConfig struct {
+	APIKey string `json:"api_key" mapstructure:"api_key"`
+}
+
 func (cc *CoinMarketCapConfig) Validate() error {
+	return nil
+}
+
+func (cg *CoinGeckoConfig) Validate() error {
 	return nil
 }
 

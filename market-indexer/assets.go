@@ -170,10 +170,12 @@ func (idx *Indexer) AssociateCoinMarketCap(
 	var err error
 	associatedInputs := make([]provider.CreateProviderMarket, 0, len(inputs))
 	for _, input := range inputs {
+		targetBase := utils.ConvertTargetBase(input.Create.TargetBase)
+
 		// check pairs
 		data, found := providerMarketPairs.Data[coinmarketcap.ProviderMarketPairKey(
 			input.Create.ProviderName,
-			input.Create.TargetBase,
+			targetBase,
 			input.Create.TargetQuote,
 		)]
 		if found && input.BaseAddress == "" { // pair data does use addresses for matching, so do not use for defi
@@ -200,7 +202,8 @@ func (idx *Indexer) AssociateCoinMarketCap(
 			info, ok := idx.knownAssets.LookupAssetInfo(input.Create.TargetBase, input.BaseAddress)
 			if !ok {
 				idx.logger.Debug("failed to check known base asset info for CMC info", zap.Any("input", input))
-				continue
+				// milkTIA
+				//continue
 			}
 			input.Create.BaseAssetInfoID = info.ID
 

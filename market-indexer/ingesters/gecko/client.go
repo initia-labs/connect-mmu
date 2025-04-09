@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	BaseEndpoint = "https://api.geckoterminal.com/api/v2"
+	BaseEndpoint = "https://pro-api.coingecko.com/api/v3/onchain"
 
 	// https://www.geckoterminal.com/dex-api
 	// we can only make 30 calls a minute.
@@ -32,11 +32,12 @@ type geckoClientImpl struct {
 	client       *http.Client
 	logger       *zap.Logger
 	baseEndpoint string
+	apiKey       string
 
 	limiter *APIRateLimiter
 }
 
-func newClient(logger *zap.Logger, baseEndpoint string) Client {
+func newClient(logger *zap.Logger, baseEndpoint string, apiKey string) Client {
 	if baseEndpoint == "" {
 		baseEndpoint = BaseEndpoint
 	}
@@ -44,11 +45,12 @@ func newClient(logger *zap.Logger, baseEndpoint string) Client {
 		client:       http.NewClient(),
 		logger:       logger,
 		baseEndpoint: baseEndpoint,
+		apiKey:       apiKey,
 		limiter:      newRateLimiter(maxCalls, callInterval),
 	}
 }
 
-func (c *geckoClientImpl) GetWithContext(ctx context.Context, endpoint string) (*http2.Response, error) {
+func (c *geckoClientImpl) GetWithContext(ctx context.Context, endpoint string, opts ...http.GetOptions) (*http2.Response, error) {
 	c.limiter.WaitForNextAvailableCall()
-	return c.client.GetWithContext(ctx, endpoint)
+	return c.client.GetWithContext(ctx, endpoint, opts...)
 }
