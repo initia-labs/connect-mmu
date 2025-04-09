@@ -64,12 +64,19 @@ func (g *Generator) GenerateMarketMap(
 
 	g.logger.Info("apply market map filter")
 	list := filter.GetMarketMapList()
+	filteredCount := 0
 	for key, market := range mm.Markets {
 		if _, exists := list[market.Ticker.CurrencyPair.Base]; !exists {
+			g.logger.Debug("filtering out market",
+				zap.String("ticker", key),
+				zap.String("base", market.Ticker.CurrencyPair.Base),
+				zap.String("quote", market.Ticker.CurrencyPair.Quote))
 			delete(mm.Markets, key)
+			filteredCount++
 		}
 	}
 
+	g.logger.Info("market filtering complete", zap.Int("filtered_out", filteredCount))
 	g.logger.Info("final market", zap.Int("size", len(mm.Markets)))
 
 	return mm, dropped, nil

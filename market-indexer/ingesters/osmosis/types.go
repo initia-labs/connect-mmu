@@ -129,7 +129,10 @@ type Status struct {
 }
 
 func (o *OsmosisMarketData) toProvideMarket() (provider.CreateProviderMarket, error) {
-	contractAddress, _ := strconv.ParseUint(o.ContractAddress, 10, 64)
+	contractAddress, err := strconv.ParseUint(o.ContractAddress, 10, 64)
+	if err != nil {
+		return provider.CreateProviderMarket{}, fmt.Errorf("osmosis client: failed to parse contract address: %w", err)
+	}
 	metaData := osmosis.TickerMetadata{
 		PoolID:          contractAddress,
 		BaseTokenDenom:  o.BaseAssetContractAddress,

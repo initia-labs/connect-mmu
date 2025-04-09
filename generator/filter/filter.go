@@ -1,5 +1,6 @@
 package filter
 
+// GetMarketMapList returns a map of allowed market symbols
 func GetMarketMapList() map[string]bool {
 	return map[string]bool{
 		"ATOM":    true,
@@ -28,8 +29,13 @@ func GetMarketMapList() map[string]bool {
 	}
 }
 
+// GetSkipList returns a map of market pairs that should be skipped during processing.
+// These pairs are excluded from market operations for various reasons:
+//   - milkTIA/TIA: This pair is skipped because milkTIA is not verified by CoinMarketCap.
+//     The token's logo and social links are from third-party sources, requiring special handling
+//     and verification before it can be properly integrated into the market map.
 func GetSkipList() map[string]bool {
 	return map[string]bool{
-		"milkTIA/TIA": true,
+		"milkTIA/TIA": true, // Skip this pair as it requires special handling
 	}
 }

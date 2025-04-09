@@ -51,14 +51,16 @@ func (c *httpClient) OsmosisMarkets(ctx context.Context) (OsmosisMarketResponse,
 
 		resp, err := c.client.GetWithContext(ctx, EndpointOsmosisMarkets, opts...)
 		if err != nil {
-			return response, err
-		}
-
-		var pageresponse OsmosisMarketResponse
-		if err := json.NewDecoder(resp.Body).Decode(&pageresponse); err != nil {
+			c.logger.Error("failed to get osmosis market data", zap.Error(err))
 			return response, err
 		}
 		defer resp.Body.Close()
+
+		var pageresponse OsmosisMarketResponse
+		if err := json.NewDecoder(resp.Body).Decode(&pageresponse); err != nil {
+			c.logger.Error("failed to decode osmosis market response", zap.Error(err))
+			return response, err
+		}
 
 		allData = append(allData, pageresponse.Data...)
 
@@ -67,9 +69,11 @@ func (c *httpClient) OsmosisMarkets(ctx context.Context) (OsmosisMarketResponse,
 		}
 
 		scrollID = pageresponse.Data[len(pageresponse.Data)-1].ScrollID
+		c.logger.Debug("fetching next page with scroll ID", zap.String("scroll_id", scrollID))
 	}
 
 	response.Data = allData
+	c.logger.Info("fetched osmosis market data", zap.Int("total_markets", len(allData)))
 
 	return response, nil
 }
