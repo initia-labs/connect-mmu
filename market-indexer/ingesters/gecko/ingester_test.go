@@ -51,9 +51,8 @@ func TestGetProviderMarkets(t *testing.T) {
 	defer server.Close()
 	logger, err := zap.NewDevelopment()
 	require.NoError(t, err)
-
 	// create gecko client but with test server URL
-	client := newClient(logger, server.URL)
+	client := newClient(logger, server.URL, "")
 
 	ingester := &Ingester{
 		logger: logger,
