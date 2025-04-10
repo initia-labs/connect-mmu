@@ -54,7 +54,9 @@ func NormalizeBy() TransformFeed {
 					return nil, nil, err
 				}
 				newQuote := normPair.Quote
-				feed.ProviderConfig.NormalizeByPair = &normPair
+				if feed.ProviderConfig.Name != "gecko_terminal_api" {
+					feed.ProviderConfig.NormalizeByPair = &normPair
+				}
 				feed.Ticker.CurrencyPair.Quote = newQuote
 
 				adjustPrice, ok := avgRefPrices[normPair.String()]

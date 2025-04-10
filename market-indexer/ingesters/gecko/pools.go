@@ -265,20 +265,7 @@ func (p *PoolData) ReferencePrice() (float64, error) {
 }
 
 func (p *PoolData) OffChainTicker() (string, error) {
-	targetBase, err := p.Base()
-	if err != nil {
-		return "", err
-	}
-
-	targetQuote, err := p.Quote()
-	if err != nil {
-		return "", err
-	}
-
-	return strings.ToUpper(strings.Join([]string{
-		targetBase,
-		targetQuote,
-	}, types.TickerSeparator)), nil
+	return p.BaseAddress(), nil
 }
 
 func removeTrailingNumbers(s string) string {
