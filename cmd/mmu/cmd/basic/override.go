@@ -59,6 +59,7 @@ func OverrideCmd() *cobra.Command {
 				flags.overwriteProviders,
 				flags.existingOnly,
 				flags.disableDeFiMarketMerging,
+				flags.enableNewMarkets,
 			)
 			if err != nil {
 				return err
@@ -91,6 +92,7 @@ type overrideCmdFlags struct {
 	overwriteProviders       bool
 	existingOnly             bool
 	disableDeFiMarketMerging bool
+	enableNewMarkets         bool
 }
 
 func overrideCmdConfigureFlags(cmd *cobra.Command, flags *overrideCmdFlags) {
@@ -100,6 +102,7 @@ func overrideCmdConfigureFlags(cmd *cobra.Command, flags *overrideCmdFlags) {
 	cmd.Flags().BoolVar(&flags.overwriteProviders, OverwriteProvidersFlag, OverwriteProvidersDefault, OverwriteProvidersDescription)
 	cmd.Flags().BoolVar(&flags.existingOnly, ExistingOnlyFlag, ExistingOnlyDefault, ExistingOnlyDescription)
 	cmd.Flags().BoolVar(&flags.disableDeFiMarketMerging, DisableDeFiMarketMerging, DisableDeFiMarketMergingDefault, DisableDeFiMarketMergingDescription)
+	cmd.Flags().BoolVar(&flags.enableNewMarkets, EnableNewMarkets, EnableNewMarketsDefault, EnableNewMarketsDescription)
 
 	cmd.Flags().StringVar(&flags.marketMapOutPath, MarketMapOutPathOverrideFlag, MarketMapOutPathOverrideDefault, MarketMapOutPathOverrideDescription)
 }
@@ -109,7 +112,7 @@ func OverrideMarketsFromConfig(
 	logger *zap.Logger,
 	cfg config.ChainConfig,
 	generated mmtypes.MarketMap,
-	updateEnabled, overwriteProviders, existingOnly, disableDeFiMarketMerging bool,
+	updateEnabled, overwriteProviders, existingOnly, disableDeFiMarketMerging, enableNewMarkets bool,
 ) (mmtypes.MarketMap, error) {
 	// create client based on config
 	mmClient, err := marketmapclient.NewClientFromChainConfig(logger, cfg)
@@ -147,6 +150,7 @@ func OverrideMarketsFromConfig(
 			OverwriteProviders:       overwriteProviders,
 			ExistingOnly:             existingOnly,
 			DisableDeFiMarketMerging: disableDeFiMarketMerging,
+			EnableNewMarkets:         enableNewMarkets,
 		},
 	)
 	if err != nil {

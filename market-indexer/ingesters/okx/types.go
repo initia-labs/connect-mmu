@@ -92,6 +92,10 @@ func (ir *InstrumentData) toProviderMarket(td TickerData) (provider.CreateProvid
 		return provider.CreateProviderMarket{}, err
 	}
 
+	if td.Open24h == "" {
+		return provider.CreateProviderMarket{}, fmt.Errorf("skipping market %s: Open24h is empty", ir.InstID)
+	}
+
 	refPrice, err := strconv.ParseFloat(td.Open24h, 64)
 	if err != nil {
 		return provider.CreateProviderMarket{}, fmt.Errorf("failed to convert Open24h: %w", err)

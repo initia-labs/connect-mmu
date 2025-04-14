@@ -33,6 +33,10 @@ const (
 	DisableDeFiMarketMergingDefault     = false
 	DisableDeFiMarketMergingDescription = "disables the merging of DeFi markets into markets that have the same CMC ID"
 
+	EnableNewMarkets            = "enable-new-markets"
+	EnableNewMarketsDefault     = false
+	EnableNewMarketsDescription = "If a market is not found in the on-chain market map, it will be added but kept disabled by default"
+
 	// upserts
 	MarketMapOverrideFlag        = "market-map"
 	MarketMapOverrideDefault     = "./tmp/override-market-map.json"

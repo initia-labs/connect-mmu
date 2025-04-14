@@ -7,6 +7,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/skip-mev/connect-mmu/config"
+	"github.com/skip-mev/connect-mmu/generator/filter"
 	"github.com/skip-mev/connect-mmu/generator/querier"
 	"github.com/skip-mev/connect-mmu/generator/transformer"
 	"github.com/skip-mev/connect-mmu/generator/types"
@@ -61,6 +62,21 @@ func (g *Generator) GenerateMarketMap(
 	}
 	dropped.Merge(droppedMarkets)
 
+	g.logger.Info("apply market map filter")
+	list := filter.GetMarketMapList()
+	filteredCount := 0
+	for key, market := range mm.Markets {
+		if _, exists := list[market.Ticker.CurrencyPair.Base]; !exists {
+			g.logger.Debug("filtering out market",
+				zap.String("ticker", key),
+				zap.String("base", market.Ticker.CurrencyPair.Base),
+				zap.String("quote", market.Ticker.CurrencyPair.Quote))
+			delete(mm.Markets, key)
+			filteredCount++
+		}
+	}
+
+	g.logger.Info("market filtering complete", zap.Int("filtered_out", filteredCount))
 	g.logger.Info("final market", zap.Int("size", len(mm.Markets)))
 
 	return mm, dropped, nil

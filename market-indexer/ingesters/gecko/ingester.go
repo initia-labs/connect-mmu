@@ -4,19 +4,19 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"strings"
-
-	"github.com/skip-mev/connect/v2/providers/apis/defi/uniswapv3"
 	"go.uber.org/zap"
 	"gopkg.in/typ.v4/maps"
 
 	"github.com/skip-mev/connect-mmu/config"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters"
+	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/types"
 	"github.com/skip-mev/connect-mmu/store/provider"
+	"github.com/skip-mev/connect/v2/providers/apis/geckoterminal"
 )
 
 const (
-	Name = "gecko"
+	Name         = "gecko_terminal"
+	ProviderName = Name + types.ProviderNameSuffixAPI
 )
 
 var _ ingesters.Ingester = &Ingester{}
@@ -36,7 +36,7 @@ func New(logger *zap.Logger, marketConfig config.MarketConfig) *Ingester {
 	ing := &Ingester{
 		logger: logger.With(zap.String("ingester", Name)),
 		pairs:  marketConfig.GeckoNetworkDexPairs,
-		client: newClient(logger, BaseEndpoint),
+		client: newClient(logger, BaseEndpoint, marketConfig.CoinGeckoConfig.APIKey),
 	}
 	return ing
 }
@@ -53,6 +53,7 @@ func (ig *Ingester) GetProviderMarkets(ctx context.Context) ([]provider.CreatePr
 	// for each network+dex pair:
 	for _, pair := range ig.pairs {
 		// get the top pools in that network + dex.
+		pair.Dex = ConvertDexName(pair.Dex)
 		pools, err := ig.topPools(ctx, pair.Network, pair.Dex)
 		if err != nil {
 			return nil, err
@@ -84,7 +85,6 @@ func (ig *Ingester) GetProviderMarkets(ctx context.Context) ([]provider.CreatePr
 
 		// iterate over all the pools, and create provider market params using the token + pool data.
 		for _, pool := range pools {
-			baseData := tokensData[pool.BaseAddress()]
 			quoteData := tokensData[pool.QuoteAddress()]
 			quoteVol, err := pool.QuoteVolume()
 			if err != nil {
@@ -109,20 +109,18 @@ func (ig *Ingester) GetProviderMarkets(ctx context.Context) ([]provider.CreatePr
 			//
 			// TODO: we currently need to do the opposite of the above, however, as there is a bug in Connect's uniswap code.
 			// it will actually invert the price when invert == false, and not invert it when invert == true.
-			invert := strings.Compare(pool.BaseAddress(), pool.QuoteAddress()) == 1
-			metaData := uniswapv3.PoolConfig{
-				Address:       pool.VenueAddress(),
-				BaseDecimals:  int64(baseData.Decimals()),
-				QuoteDecimals: int64(quoteData.Decimals()),
-				Invert:        invert,
+			metaData := geckoterminal.GeckoterminalMetadata{
+				Network: pair.Network,
 			}
+
 			metaDataBz, err := json.Marshal(metaData)
 			if err != nil {
 				return nil, fmt.Errorf("gecko client: failed to marshal metadata: %w", err)
 			}
 			refPrice, err := pool.ReferencePrice()
 			if err != nil {
-				return nil, err
+				ig.logger.Debug("failed to get reference price for pool", zap.Error(err))
+				continue
 			}
 
 			targetBase, err := pool.Base()
@@ -148,7 +146,7 @@ func (ig *Ingester) GetProviderMarkets(ctx context.Context) ([]provider.CreatePr
 					TargetBase:     targetBase,
 					TargetQuote:    targetQuote,
 					OffChainTicker: offChainTicker,
-					ProviderName:   geckoDexToConnectDex(pool.Venue()),
+					ProviderName:   ProviderName,
 					QuoteVolume:    quoteVolF64,
 					MetadataJSON:   metaDataBz,
 					ReferencePrice: refPrice,

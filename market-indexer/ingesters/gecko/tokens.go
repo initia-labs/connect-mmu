@@ -7,6 +7,7 @@ import (
 
 	"go.uber.org/zap"
 
+	"github.com/skip-mev/connect-mmu/lib/http"
 	sauronslices "github.com/skip-mev/connect-mmu/lib/slices"
 	sauronstrings "github.com/skip-mev/connect-mmu/lib/strings"
 )
@@ -76,7 +77,13 @@ func (c *geckoClientImpl) MultiToken(ctx context.Context, network string, tokens
 	for _, chunk := range chunkedTokens {
 		endpoint := fmt.Sprintf("%s/networks/%s/tokens/multi/%s", c.baseEndpoint, network, sauronstrings.CommaSeparate(chunk))
 		c.logger.Debug("getting tokens", zap.String("network", network), zap.Strings("tokens", chunk))
-		res, err := c.GetWithContext(ctx, endpoint)
+
+		opts := []http.GetOptions{
+			http.WithHeader("x-cg-pro-api-key", c.apiKey),
+			http.WithJSONAccept(),
+		}
+
+		res, err := c.GetWithContext(ctx, endpoint, opts...)
 		if err != nil {
 			return nil, fmt.Errorf("gecko client: failed to fetch tokens multi: %w", err)
 		}

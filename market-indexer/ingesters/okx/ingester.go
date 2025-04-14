@@ -3,6 +3,7 @@ package okx
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"go.uber.org/zap"
 
@@ -80,6 +81,14 @@ func (ig *Ingester) GetProviderMarkets(ctx context.Context) ([]provider.CreatePr
 
 		pm, err := data.toProviderMarket(ticker)
 		if err != nil {
+			if strings.Contains(err.Error(), "skipping market") {
+				ig.logger.Debug("skipping market",
+					zap.String("instID", data.InstID),
+					zap.String("base", data.BaseCcy),
+					zap.String("quote", data.QuoteCcy),
+					zap.Error(err))
+				continue
+			}
 			return nil, err
 		}
 

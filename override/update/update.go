@@ -10,6 +10,7 @@ type Options struct {
 	OverwriteProviders       bool
 	ExistingOnly             bool
 	DisableDeFiMarketMerging bool
+	EnableNewMarkets         bool
 }
 
 // CombineMarketMaps adds the given generated markets to the actual market.
@@ -77,8 +78,8 @@ func CombineMarketMaps(
 				zap.String("ticker", ticker),
 			)
 
-			// if not found in the on chain marketmap, add, but disable
-			market.Ticker.Enabled = false
+			// if not found in the on chain marketmap, add
+			market.Ticker.Enabled = options.EnableNewMarkets
 		}
 		combined.Markets[ticker] = market
 	}

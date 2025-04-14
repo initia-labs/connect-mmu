@@ -7,6 +7,7 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/exp/maps"
 
+	"github.com/skip-mev/connect-mmu/generator/filter"
 	"github.com/skip-mev/connect-mmu/lib/symbols"
 	"github.com/skip-mev/connect-mmu/market-indexer/coinmarketcap"
 	"github.com/skip-mev/connect-mmu/market-indexer/utils"
@@ -170,10 +171,12 @@ func (idx *Indexer) AssociateCoinMarketCap(
 	var err error
 	associatedInputs := make([]provider.CreateProviderMarket, 0, len(inputs))
 	for _, input := range inputs {
+		targetBase := utils.ConvertTargetBase(input.Create.TargetBase)
+
 		// check pairs
 		data, found := providerMarketPairs.Data[coinmarketcap.ProviderMarketPairKey(
 			input.Create.ProviderName,
-			input.Create.TargetBase,
+			targetBase,
 			input.Create.TargetQuote,
 		)]
 		if found && input.BaseAddress == "" { // pair data does use addresses for matching, so do not use for defi
@@ -200,7 +203,16 @@ func (idx *Indexer) AssociateCoinMarketCap(
 			info, ok := idx.knownAssets.LookupAssetInfo(input.Create.TargetBase, input.BaseAddress)
 			if !ok {
 				idx.logger.Debug("failed to check known base asset info for CMC info", zap.Any("input", input))
-				continue
+				// Check if this pair should be skipped
+				pairKey := fmt.Sprintf("%s/%s", input.Create.TargetBase, input.Create.TargetQuote)
+				if filter.GetSkipList()[pairKey] {
+					idx.logger.Debug("skipping pair as per skip list", zap.String("pair", pairKey))
+					info = provider.AssetInfo{
+						ID: 0,
+					}
+				} else {
+					continue
+				}
 			}
 			input.Create.BaseAssetInfoID = info.ID
 
