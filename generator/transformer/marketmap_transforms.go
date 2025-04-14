@@ -11,6 +11,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/skip-mev/connect-mmu/config"
+	"github.com/skip-mev/connect-mmu/generator/filter"
 	"github.com/skip-mev/connect-mmu/generator/types"
 )
 
@@ -42,7 +43,11 @@ func OverrideMinProviderCount() TransformMarketMap {
 		}
 		logger.Info("overriding min provider count")
 		for name, market := range mm.Markets {
-			market.Ticker.MinProviderCount = cfg.MinProviderCountOverride
+			if filter.MinProvidersThreshold < len(market.ProviderConfigs) {
+				market.Ticker.MinProviderCount = uint64(filter.MinProvidersThreshold)
+			} else {
+				market.Ticker.MinProviderCount = uint64(len(market.ProviderConfigs))
+			}
 			mm.Markets[name] = market
 		}
 		return mm, nil, nil

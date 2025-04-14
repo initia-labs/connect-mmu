@@ -34,6 +34,7 @@ func New(logger *zap.Logger) Transformer {
 			DropFeedsWithoutAggregatorIDs(),
 			ResolveConflictsForProvider(),
 			TopFeedsForProvider(),
+			TopNProviders(),
 		},
 		mmTransforms: []TransformMarketMap{
 			PruneMarkets(),

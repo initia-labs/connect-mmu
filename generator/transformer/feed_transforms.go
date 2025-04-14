@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"math/big"
+	"slices"
 	"strings"
 
 	connecttypes "github.com/skip-mev/connect/v2/pkg/types"
@@ -14,6 +15,7 @@ import (
 	"github.com/skip-mev/connect-mmu/config"
 	"github.com/skip-mev/connect-mmu/generator/filter"
 	"github.com/skip-mev/connect-mmu/generator/types"
+	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/gecko"
 )
 
 // TransformFeed is a function that performs some transformation on the given input markets.
@@ -54,7 +56,7 @@ func NormalizeBy() TransformFeed {
 					return nil, nil, err
 				}
 				newQuote := normPair.Quote
-				if feed.ProviderConfig.Name != "gecko_terminal_api" {
+				if feed.ProviderConfig.Name != gecko.ProviderName {
 					feed.ProviderConfig.NormalizeByPair = &normPair
 				}
 				feed.Ticker.CurrencyPair.Quote = newQuote
@@ -460,6 +462,54 @@ func TopFeedsForProvider() TransformFeed {
 		}
 
 		return provFeeds.ToFeeds(), removals, nil
+	}
+}
+
+func TopNProviders() TransformFeed {
+	return func(_ context.Context, logger *zap.Logger, cfg config.GenerateConfig, feeds types.Feeds,
+	) (types.Feeds, types.RemovalReasons, error) {
+		logger.Info("remaining top N providers", zap.Int("feeds", len(feeds)))
+
+		// Group feeds by ticker to sort providers by liquidity
+		feedsByTicker := make(map[string]types.Feeds)
+		for _, feed := range feeds {
+			feedsByTicker[feed.TickerString()] = append(feedsByTicker[feed.TickerString()], feed)
+		}
+
+		out := make(types.Feeds, 0)
+		removals := types.NewRemovalReasons()
+
+		for tickerStr, tickerFeeds := range feedsByTicker {
+			// Sort feeds by total liquidity in descending order
+			slices.SortFunc(tickerFeeds, func(a, b types.Feed) int {
+				aTotal := a.LiquidityInfo.TotalLiquidity()
+				bTotal := b.LiquidityInfo.TotalLiquidity()
+				if aTotal > bTotal {
+					return -1
+				}
+				if aTotal < bTotal {
+					return 1
+				}
+				return 0
+			})
+
+			// If there are more than MaxProvidersCount providers, keep only top MaxProvidersCount
+			if len(tickerFeeds) > filter.MaxProvidersCount {
+				out = append(out, tickerFeeds[:filter.MaxProvidersCount]...)
+
+				// Add removal reasons for the dropped providers
+				for _, feed := range tickerFeeds[filter.MaxProvidersCount:] {
+					removals.AddRemovalReasonFromFeed(feed, feed.ProviderConfig.Name,
+						fmt.Sprintf("only keeping top %d providers by liquidity for %s", filter.MaxProvidersCount, tickerStr))
+				}
+			} else {
+				// If there are MaxProvidersCount or fewer providers, keep all of them
+				out = append(out, tickerFeeds...)
+			}
+		}
+
+		logger.Info("kept top providers", zap.Int("remaining feeds", len(out)))
+		return out, removals, nil
 	}
 }
 
