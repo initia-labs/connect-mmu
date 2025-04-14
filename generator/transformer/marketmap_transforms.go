@@ -43,8 +43,9 @@ func OverrideMinProviderCount() TransformMarketMap {
 		}
 		logger.Info("overriding min provider count")
 		for name, market := range mm.Markets {
-			if filter.MinProvidersThreshold < len(market.ProviderConfigs) {
-				market.Ticker.MinProviderCount = uint64(filter.MinProvidersThreshold)
+			minCount := filter.MinProvidersThreshold
+			if minCount < len(market.ProviderConfigs) {
+				market.Ticker.MinProviderCount = uint64(minCount)
 			} else {
 				market.Ticker.MinProviderCount = uint64(len(market.ProviderConfigs))
 			}
