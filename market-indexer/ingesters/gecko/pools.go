@@ -198,21 +198,7 @@ func (p *PoolData) Venue() string {
 }
 
 func (p *PoolData) VenueAddress() string {
-	baseOffChain := strings.Join([]string{
-		geckoDexToConnectTickerVenue(p.Venue()),
-		p.BaseAddress(),
-	}, types.DefiTickerDelimiter)
-
-	quoteOffChain := strings.Join([]string{
-		geckoDexToConnectTickerVenue(p.Venue()),
-		p.QuoteAddress(),
-	}, types.DefiTickerDelimiter)
-
-	return strings.ToUpper(strings.Join([]string{
-		p.Attributes.Address,
-		baseOffChain,
-		quoteOffChain,
-	}, types.TickerSeparator))
+	return p.Attributes.Address
 }
 
 // Base returns the properly formated base symbol.
@@ -265,7 +251,20 @@ func (p *PoolData) ReferencePrice() (float64, error) {
 }
 
 func (p *PoolData) OffChainTicker() (string, error) {
-	return p.BaseAddress(), nil
+	targetBase, err := p.Base()
+	if err != nil {
+		return "", err
+	}
+
+	targetQuote, err := p.Quote()
+	if err != nil {
+		return "", err
+	}
+
+	return strings.ToUpper(strings.Join([]string{
+		targetBase,
+		targetQuote,
+	}, types.TickerSeparator)), nil
 }
 
 func removeTrailingNumbers(s string) string {
