@@ -261,9 +261,21 @@ func (p *PoolData) OffChainTicker() (string, error) {
 		return "", err
 	}
 
-	return strings.ToUpper(strings.Join([]string{
+	targetBaseOffchain := strings.Join([]string{
 		targetBase,
+		geckoDexToConnectTickerVenue(p.Venue()),
+		p.BaseAddress(),
+	}, types.DefiTickerDelimiter)
+
+	targetQuoteOffchain := strings.Join([]string{
 		targetQuote,
+		geckoDexToConnectTickerVenue(p.Venue()),
+		p.QuoteAddress(),
+	}, types.DefiTickerDelimiter)
+
+	return strings.ToUpper(strings.Join([]string{
+		targetBaseOffchain,
+		targetQuoteOffchain,
 	}, types.TickerSeparator)), nil
 }
 
