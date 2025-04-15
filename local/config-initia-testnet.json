@@ -63,7 +63,7 @@
       "coinbase_ws": {
         "isSupplemental": false,
         "require_aggregate_ids": false,
-        "filters": { "top_markets": 100 },
+        "filters": { "top_markets": 0 },
         "ignore_liquidity": false,
         "ignore_volume": false
       },

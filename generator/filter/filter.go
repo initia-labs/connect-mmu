@@ -1,5 +1,10 @@
 package filter
 
+var (
+	MinProvidersThreshold = 3
+	MaxProvidersCount     = 7
+)
+
 // GetMarketMapList returns a map of allowed market symbols
 func GetMarketMapList() map[string]bool {
 	return map[string]bool{
@@ -36,6 +41,7 @@ func GetMarketMapList() map[string]bool {
 //     and verification before it can be properly integrated into the market map.
 func GetSkipList() map[string]bool {
 	return map[string]bool{
-		"milkTIA/TIA": true, // Skip this pair as it requires special handling
+		// Skip these pairs as it requires special handling
+		"milkTIA/TIA": true,
 	}
 }
