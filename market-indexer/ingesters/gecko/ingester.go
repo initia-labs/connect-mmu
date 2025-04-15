@@ -185,7 +185,7 @@ func (ig *Ingester) GetProviderMarkets(ctx context.Context) ([]provider.CreatePr
 		}
 
 		// add gecko_terminal_api provider markets
-		for venueAddress, info := range venueAddresses {
+		for _, info := range venueAddresses {
 			metaData := geckoterminal.GeckoterminalMetadata{
 				Network: pair.Network,
 			}
@@ -197,7 +197,7 @@ func (ig *Ingester) GetProviderMarkets(ctx context.Context) ([]provider.CreatePr
 				Create: provider.CreateProviderMarketParams{
 					TargetBase:     info.targetBase,
 					TargetQuote:    QuoteUSD,
-					OffChainTicker: venueAddress,
+					OffChainTicker: info.baseAddress,
 					ProviderName:   ProviderName,
 					MetadataJSON:   metaDataBz,
 					QuoteVolume:    0,
