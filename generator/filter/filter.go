@@ -2,7 +2,7 @@ package filter
 
 var (
 	MinProvidersThreshold = 3
-	MaxProvidersCount     = 5
+	MaxProvidersCount     = 7
 )
 
 // GetMarketMapList returns a map of allowed market symbols
