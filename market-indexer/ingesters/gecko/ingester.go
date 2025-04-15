@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
+
 	"go.uber.org/zap"
 	"gopkg.in/typ.v4/maps"
 
@@ -11,12 +13,14 @@ import (
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/types"
 	"github.com/skip-mev/connect-mmu/store/provider"
+	"github.com/skip-mev/connect/v2/providers/apis/defi/uniswapv3"
 	"github.com/skip-mev/connect/v2/providers/apis/geckoterminal"
 )
 
 const (
 	Name         = "gecko_terminal"
 	ProviderName = Name + types.ProviderNameSuffixAPI
+	QuoteUSD     = "USD"
 )
 
 var _ ingesters.Ingester = &Ingester{}
@@ -83,8 +87,16 @@ func (ig *Ingester) GetProviderMarkets(ctx context.Context) ([]provider.CreatePr
 			tokensData[tokenData.Attributes.Address] = tokenData
 		}
 
+		// map of venue address -> Base
+		type info struct {
+			baseAddress string
+			targetBase  string
+		}
+		venueAddresses := make(map[string]info)
+
 		// iterate over all the pools, and create provider market params using the token + pool data.
 		for _, pool := range pools {
+			baseData := tokensData[pool.BaseAddress()]
 			quoteData := tokensData[pool.QuoteAddress()]
 			quoteVol, err := pool.QuoteVolume()
 			if err != nil {
@@ -109,8 +121,12 @@ func (ig *Ingester) GetProviderMarkets(ctx context.Context) ([]provider.CreatePr
 			//
 			// TODO: we currently need to do the opposite of the above, however, as there is a bug in Connect's uniswap code.
 			// it will actually invert the price when invert == false, and not invert it when invert == true.
-			metaData := geckoterminal.GeckoterminalMetadata{
-				Network: pair.Network,
+			invert := strings.Compare(pool.BaseAddress(), pool.QuoteAddress()) == 1
+			metaData := uniswapv3.PoolConfig{
+				Address:       pool.VenueAddress(),
+				BaseDecimals:  int64(baseData.Decimals()),
+				QuoteDecimals: int64(quoteData.Decimals()),
+				Invert:        invert,
 			}
 
 			metaDataBz, err := json.Marshal(metaData)
@@ -146,7 +162,7 @@ func (ig *Ingester) GetProviderMarkets(ctx context.Context) ([]provider.CreatePr
 					TargetBase:     targetBase,
 					TargetQuote:    targetQuote,
 					OffChainTicker: offChainTicker,
-					ProviderName:   ProviderName,
+					ProviderName:   geckoDexToConnectDex(pool.Venue()),
 					QuoteVolume:    quoteVolF64,
 					MetadataJSON:   metaDataBz,
 					ReferencePrice: refPrice,
@@ -155,6 +171,42 @@ func (ig *Ingester) GetProviderMarkets(ctx context.Context) ([]provider.CreatePr
 				QuoteAddress: pool.QuoteAddress(),
 			}
 			providerMarkets = append(providerMarkets, market)
+
+			// add the venue address to the map if it doesn't exist.
+			if _, ok := venueAddresses[pair.Network]; !ok {
+				venueAddresses[pool.VenueAddress()] = struct {
+					baseAddress string
+					targetBase  string
+				}{
+					baseAddress: pool.BaseAddress(),
+					targetBase:  targetBase,
+				}
+			}
+
+		}
+
+		// add gecko_terminal_api provider markets
+		for venueAddress, info := range venueAddresses {
+			metaData := geckoterminal.GeckoterminalMetadata{
+				Network: pair.Network,
+			}
+			metaDataBz, err := json.Marshal(metaData)
+			if err != nil {
+				return nil, fmt.Errorf("gecko client: failed to marshal metadata: %w", err)
+			}
+			providerMarkets = append(providerMarkets, provider.CreateProviderMarket{
+				Create: provider.CreateProviderMarketParams{
+					TargetBase:     info.targetBase,
+					TargetQuote:    QuoteUSD,
+					OffChainTicker: venueAddress,
+					ProviderName:   ProviderName,
+					MetadataJSON:   metaDataBz,
+					QuoteVolume:    0,
+					ReferencePrice: 0,
+				},
+				BaseAddress:  info.baseAddress,
+				QuoteAddress: "",
+			})
 		}
 	}
 	ig.logger.Info("fetched data", zap.Int("markets", len(providerMarkets)))
