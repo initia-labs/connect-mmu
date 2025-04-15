@@ -2,8 +2,7 @@ package utils
 
 func ConvertTargetBase(base string) string {
 	mapping := map[string]string{
-		"USDE":  "USDe",
-		"WEETH": "weETH",
+		"USDE": "USDe",
 	}
 
 	if newBase, exists := mapping[base]; exists {

@@ -88,11 +88,11 @@ func (ig *Ingester) GetProviderMarkets(ctx context.Context) ([]provider.CreatePr
 		}
 
 		// map of venue address -> Base
-		type info struct {
+		type venueInfo struct {
 			baseAddress string
 			targetBase  string
 		}
-		venueAddresses := make(map[string]info)
+		venueAddresses := make(map[string]venueInfo)
 
 		// iterate over all the pools, and create provider market params using the token + pool data.
 		for _, pool := range pools {
@@ -182,7 +182,6 @@ func (ig *Ingester) GetProviderMarkets(ctx context.Context) ([]provider.CreatePr
 					targetBase:  targetBase,
 				}
 			}
-
 		}
 
 		// add gecko_terminal_api provider markets
