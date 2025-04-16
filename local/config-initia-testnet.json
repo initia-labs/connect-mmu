@@ -194,6 +194,11 @@
         "min_provider_volume": 10,
         "min_provider_liquidity": 1000,
         "normalize_by_pair": "TIA/USD"
+      },
+      "OSMO": {
+        "min_provider_volume": 5,
+        "min_provider_liquidity": 500,
+        "normalize_by_pair": "OSMO/USD"
       }
     },
     "min_cex_provider_count": 1,

@@ -43,5 +43,8 @@ func GetSkipList() map[string]bool {
 	return map[string]bool{
 		// Skip these pairs as it requires special handling
 		"milkTIA/TIA": true,
+		"WEETH/WETH":  true,
+		"WEETH/USD":   true,
+		"STARS/OSMO":  true,
 	}
 }

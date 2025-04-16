@@ -196,6 +196,8 @@ func (idx *Indexer) AssociateCoinMarketCap(
 			idx.logger.Debug("using asset info for CMC info",
 				zap.String("base", input.Create.TargetBase),
 				zap.String("quote", input.Create.TargetQuote),
+				zap.String("base_address", input.BaseAddress),
+				zap.String("quote_address", input.QuoteAddress),
 				zap.String("provider name", input.Create.ProviderName),
 			)
 
