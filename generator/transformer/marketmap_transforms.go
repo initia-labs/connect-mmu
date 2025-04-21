@@ -234,25 +234,6 @@ func ProcessDefiInvert() TransformMarketMap {
 						continue
 					}
 					if pc.Invert {
-						//newMetadata := curve.CurveMetadata{
-						//	Network:           metadata.Network,
-						//	PoolID:            metadata.PoolID,
-						//	BaseTokenAddress:  metadata.QuoteTokenAddress,
-						//	QuoteTokenAddress: metadata.BaseTokenAddress,
-						//}
-						//if newMetadataJson, err := json.Marshal(newMetadata); err == nil {
-						//	market.ProviderConfigs[i].OffChainTicker = metadata.QuoteTokenAddress
-						//	market.ProviderConfigs[i].Metadata_JSON = string(newMetadataJson)
-						//	logger.Debug("metadata updated",
-						//		zap.String("market", name),
-						//		zap.String("new_metadata", string(newMetadataJson)))
-						//} else {
-						//	logger.Error("failed to marshal metadata",
-						//		zap.String("market", name),
-						//		zap.Error(err))
-						//
-						//	count++
-						//}
 						market.ProviderConfigs[i].OffChainTicker = metadata.QuoteTokenAddress
 						count++
 					} else {
