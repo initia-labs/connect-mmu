@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"strings"
+
 	"github.com/skip-mev/connect-mmu/store/provider"
 )
 
@@ -17,12 +19,14 @@ func (m AssetMap) LookupAssetInfo(symbol, address string) (provider.AssetInfo, b
 		m[symbol] = make(map[string]provider.AssetInfo)
 	}
 
-	info, found := m[symbol][address]
-	if !found {
-		return provider.AssetInfo{}, false
+	lowerAddress := strings.ToLower(address)
+	for addr, info := range m[symbol] {
+		if strings.ToLower(addr) == lowerAddress {
+			return info, true
+		}
 	}
 
-	return info, true
+	return provider.AssetInfo{}, false
 }
 
 // LookupByCMCID wraps accessing an AssetInfo by a CoinMarketCap ID.

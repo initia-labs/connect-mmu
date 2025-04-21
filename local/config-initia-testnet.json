@@ -20,7 +20,8 @@
     "coingecko": {"api_key": ""},
     "raydium": null,
     "gecko_network_dex_pairs": [
-      { "network": "eth", "dex": "uniswap_v3" }
+      { "network": "eth", "dex": "uniswap_v3" },
+      { "network": "eth", "dex": "curve"}
     ]
   },
   "generate": {
@@ -49,14 +50,14 @@
       "bitfinex_ws": {
         "isSupplemental": false,
         "require_aggregate_ids": false,
-        "filters": { "top_markets": 100 },
+        "filters": { "top_markets": 0 },
         "ignore_liquidity": false,
         "ignore_volume": false
       },
       "bitstamp_api": {
         "isSupplemental": false,
         "require_aggregate_ids": false,
-        "filters": { "top_markets": 100 },
+        "filters": { "top_markets": 0 },
         "ignore_liquidity": false,
         "ignore_volume": false
       },
@@ -91,14 +92,14 @@
       "kucoin_ws": {
         "isSupplemental": false,
         "require_aggregate_ids": false,
-        "filters": { "top_markets": 100 },
+        "filters": { "top_markets": 0 },
         "ignore_liquidity": false,
         "ignore_volume": false
       },
       "okx_ws": {
         "isSupplemental": false,
         "require_aggregate_ids": false,
-        "filters": { "top_markets": 100 },
+        "filters": { "top_markets": 0 },
         "ignore_liquidity": false,
         "ignore_volume": false
       },
@@ -130,13 +131,13 @@
         "isSupplemental": false,
         "require_aggregate_ids": false,
         "filters": { "top_markets": 0 },
-        "ignore_liquidity": false,
+        "ignore_liquidity": true,
         "ignore_volume": true
       },
       "osmosis_api": {
         "isSupplemental": false,
         "require_aggregate_ids": false,
-        "filters": { "top_markets": 50 },
+        "filters": { "top_markets": 0 },
         "ignore_liquidity": true,
         "ignore_volume": false,
         "is_defi": true
@@ -148,11 +149,19 @@
         "ignore_liquidity": true,
         "ignore_volume": true,
         "is_defi": false
+      },
+      "curve_finance_api": {
+        "isSupplemental": false,
+        "require_aggregate_ids": false,
+        "filters": { "top_markets": 0 },
+        "ignore_liquidity": true,
+        "ignore_volume": false,
+        "is_defi": true
       }
     },
     "quotes": {
       "USD": {
-        "min_provider_volume":5000,
+        "min_provider_volume": 5000,
         "min_provider_liquidity": 1000
       },
       "USDT": {
@@ -176,12 +185,12 @@
         "normalize_by_pair": "ETH/USD"
       },
       "WETH": {
-        "min_provider_volume": 5,
+        "min_provider_volume": 0,
         "min_provider_liquidity": 1000,
         "normalize_by_pair": "ETH/USD"
       },
       "WBTC": {
-        "min_provider_volume": 5,
+        "min_provider_volume": 0,
         "min_provider_liquidity": 1000,
         "normalize_by_pair": "BTC/USD"
       },
@@ -203,7 +212,10 @@
     },
     "min_cex_provider_count": 1,
     "min_dex_provider_count": 1,
-    "disable_providers": null,
+    "disable_providers": {
+      "LBTC/USD": ["mexc_ws"],
+      "STARS/USD": ["gecko_terminal_api", "uniswapv3_api-ethereum"]
+    },
     "exclude_pairs": {
       "AGLD/USD": {},
       "AUD/USD": {},

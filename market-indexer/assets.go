@@ -4,14 +4,13 @@ import (
 	"context"
 	"fmt"
 
-	"go.uber.org/zap"
-	"golang.org/x/exp/maps"
-
 	"github.com/skip-mev/connect-mmu/generator/filter"
 	"github.com/skip-mev/connect-mmu/lib/symbols"
 	"github.com/skip-mev/connect-mmu/market-indexer/coinmarketcap"
 	"github.com/skip-mev/connect-mmu/market-indexer/utils"
 	"github.com/skip-mev/connect-mmu/store/provider"
+	"go.uber.org/zap"
+	"golang.org/x/exp/maps"
 )
 
 const (
@@ -171,12 +170,11 @@ func (idx *Indexer) AssociateCoinMarketCap(
 	var err error
 	associatedInputs := make([]provider.CreateProviderMarket, 0, len(inputs))
 	for _, input := range inputs {
-		targetBase := utils.ConvertTargetBase(input.Create.TargetBase)
-
+		convertedBase := utils.ConvertTargetBase(input.Create.TargetBase)
 		// check pairs
 		data, found := providerMarketPairs.Data[coinmarketcap.ProviderMarketPairKey(
 			input.Create.ProviderName,
-			targetBase,
+			convertedBase,
 			input.Create.TargetQuote,
 		)]
 		if found && input.BaseAddress == "" { // pair data does use addresses for matching, so do not use for defi

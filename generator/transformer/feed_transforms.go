@@ -55,6 +55,10 @@ func NormalizeBy() TransformFeed {
 					return nil, nil, err
 				}
 				newQuote := normPair.Quote
+
+				if filter.NormalizeBySymbol(feed.Ticker.CurrencyPair.Quote) {
+					feed.ProviderConfig.NormalizeByPair = &normPair
+				}
 				feed.Ticker.CurrencyPair.Quote = newQuote
 
 				adjustPrice, ok := avgRefPrices[normPair.String()]

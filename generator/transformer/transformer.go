@@ -41,6 +41,7 @@ func New(logger *zap.Logger) Transformer {
 			RemoveDisabledProviders(),
 			EnableMarkets(),
 			ProcessDefiMarkets(),
+			ProcessDefiInvert(),
 			PruneInsufficientlyProvidedMarkets(),
 			OverrideMinProviderCount(),
 			// always override after transforms so they are not overwritten
