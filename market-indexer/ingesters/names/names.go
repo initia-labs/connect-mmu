@@ -3,12 +3,12 @@ package names
 import (
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/binance"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/bitfinex"
+	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/bitget"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/bitstamp"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/bybit"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/coinbase"
 	crypto_com "github.com/skip-mev/connect-mmu/market-indexer/ingesters/crypto.com"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/gate"
-	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/gecko"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/huobi"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/kraken"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/kucoin"
@@ -51,10 +51,10 @@ func GetProviderName(name string) string {
 		return okx.ProviderName
 	case raydium.Name:
 		return raydium.ProviderName
-	case gecko.Name:
-		return gecko.ProviderName
 	case osmosis.Name:
 		return osmosis.ProviderName
+	case bitget.Name:
+		return bitget.ProviderName
 	default:
 		return nameUnknown
 	}

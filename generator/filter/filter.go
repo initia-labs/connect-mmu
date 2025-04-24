@@ -31,6 +31,7 @@ func GetMarketMapList() map[string]bool {
 		"SOL":     true,
 		"SUI":     true,
 		"APT":     true,
+		"INIT":    true,
 	}
 }
 
