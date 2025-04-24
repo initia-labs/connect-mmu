@@ -45,14 +45,3 @@ func GetSkipList() map[string]bool {
 		"milkTIA/TIA": true,
 	}
 }
-
-func NormalizeBySymbol(quote string) bool {
-	normalizeSymbols := []string{"OSMO"}
-
-	for _, symbol := range normalizeSymbols {
-		if quote == symbol {
-			return true
-		}
-	}
-	return false
-}
