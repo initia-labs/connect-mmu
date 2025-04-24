@@ -57,7 +57,7 @@ func NormalizeBy() TransformFeed {
 				}
 				newQuote := normPair.Quote
 
-				if feed.ProviderConfig.Name != gecko.ProviderName {
+				if feed.ProviderConfig.Name != gecko.ProviderName || feed.ProviderConfig.Name != gecko.ProviderNameCurve {
 					feed.ProviderConfig.NormalizeByPair = &normPair
 				}
 				feed.Ticker.CurrencyPair.Quote = newQuote
