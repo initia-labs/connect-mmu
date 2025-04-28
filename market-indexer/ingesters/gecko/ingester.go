@@ -13,6 +13,7 @@ import (
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/types"
 	"github.com/skip-mev/connect-mmu/store/provider"
+	"github.com/skip-mev/connect/v2/providers/apis/defi/curve"
 	"github.com/skip-mev/connect/v2/providers/apis/defi/uniswapv3"
 	"github.com/skip-mev/connect/v2/providers/apis/geckoterminal"
 )
@@ -122,11 +123,26 @@ func (ig *Ingester) GetProviderMarkets(ctx context.Context) ([]provider.CreatePr
 			// TODO: we currently need to do the opposite of the above, however, as there is a bug in Connect's uniswap code.
 			// it will actually invert the price when invert == false, and not invert it when invert == true.
 			invert := strings.Compare(pool.BaseAddress(), pool.QuoteAddress()) == 1
-			metaData := uniswapv3.PoolConfig{
-				Address:       pool.VenueAddress(),
-				BaseDecimals:  int64(baseData.Decimals()),
-				QuoteDecimals: int64(quoteData.Decimals()),
-				Invert:        invert,
+
+			metaData := MakeMetadata(pair.Dex)
+			if metaData == nil {
+				ig.logger.Debug("unsupported DEX type", zap.String("dex", pair.Dex))
+				continue
+			}
+
+			switch m := metaData.(type) {
+			case uniswapv3.PoolConfig:
+				m.Address = pool.VenueAddress()
+				m.BaseDecimals = int64(baseData.Decimals())
+				m.QuoteDecimals = int64(quoteData.Decimals())
+				m.Invert = invert
+				metaData = m
+			case curve.CurveMetadata:
+				m.Network = MakeNetwork(pair.Network)
+				m.PoolID = pool.VenueAddress()
+				m.BaseTokenAddress = pool.BaseAddress()
+				m.QuoteTokenAddress = pool.QuoteAddress()
+				metaData = m
 			}
 
 			metaDataBz, err := json.Marshal(metaData)

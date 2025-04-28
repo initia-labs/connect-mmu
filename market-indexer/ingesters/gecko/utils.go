@@ -36,17 +36,17 @@ const (
 	ProviderNameUniswapEth   = "uniswapv3_api-ethereum"
 	ProviderNameUniswapEthV4 = "uniswapv4_api-ethereum"
 	ProviderNameUniswapBase  = "uniswapv3_api-base"
-	ProviderNameCurve        = "curve-finance"
+	ProviderNameCurve        = "curve_finance_api"
 
 	TickerVenueUniswapEth   = "UNISWAP_V3"
 	TickerVenueUniswapEthV4 = "UNISWAP_V4"
 	TickerVenueUniswapBase  = "UNISWAP_V3_BASE"
-	TickerVenueCurve        = "CURVE-FINANCE"
+	TickerVenueCurve        = "CURVE_FINANCE"
 
 	GeckoVenueUniswapEth   = "uniswap_v3"
 	GeckoVenueUniswapEthV4 = "uniswap-v4"
 	GeckoVenueUniswapBase  = "uniswap-v3-base"
-	GeckoVenueCurve        = "curve-finance"
+	GeckoVenueCurve        = "curve"
 )
 
 func geckoDexToConnectDex(dex string) string {

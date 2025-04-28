@@ -361,6 +361,8 @@ func resolveIngesterNameAliases(ingesterName string) string {
 		return "htx"
 	case "uniswap_v3":
 		return "uniswap-v3"
+	case "curve":
+		return "curve-finance"
 
 	default:
 		return ingesterName

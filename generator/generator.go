@@ -3,15 +3,14 @@ package generator
 import (
 	"context"
 
-	mmtypes "github.com/skip-mev/connect/v2/x/marketmap/types"
-	"go.uber.org/zap"
-
 	"github.com/skip-mev/connect-mmu/config"
 	"github.com/skip-mev/connect-mmu/generator/filter"
 	"github.com/skip-mev/connect-mmu/generator/querier"
 	"github.com/skip-mev/connect-mmu/generator/transformer"
 	"github.com/skip-mev/connect-mmu/generator/types"
 	"github.com/skip-mev/connect-mmu/store/provider"
+	mmtypes "github.com/skip-mev/connect/v2/x/marketmap/types"
+	"go.uber.org/zap"
 )
 
 type Generator struct {

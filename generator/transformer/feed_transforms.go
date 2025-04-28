@@ -15,6 +15,7 @@ import (
 	"github.com/skip-mev/connect-mmu/config"
 	"github.com/skip-mev/connect-mmu/generator/filter"
 	"github.com/skip-mev/connect-mmu/generator/types"
+	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/gecko"
 )
 
 // TransformFeed is a function that performs some transformation on the given input markets.
@@ -55,6 +56,10 @@ func NormalizeBy() TransformFeed {
 					return nil, nil, err
 				}
 				newQuote := normPair.Quote
+
+				if feed.ProviderConfig.Name != gecko.ProviderName && feed.ProviderConfig.Name != gecko.ProviderNameCurve {
+					feed.ProviderConfig.NormalizeByPair = &normPair
+				}
 				feed.Ticker.CurrencyPair.Quote = newQuote
 
 				adjustPrice, ok := avgRefPrices[normPair.String()]

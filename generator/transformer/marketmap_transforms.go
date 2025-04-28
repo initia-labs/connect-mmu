@@ -2,7 +2,10 @@ package transformer
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/gecko"
+	"github.com/skip-mev/connect/v2/providers/apis/defi/curve"
 	"slices"
 	"strings"
 
@@ -212,6 +215,36 @@ func ProcessDefiMarkets() TransformMarketMap {
 		}
 
 		logger.Info("processed defi markets", zap.Int("num markets", len(mm.Markets)))
+		return mm, nil, nil
+	}
+}
+
+func ProcessDefiInvert() TransformMarketMap {
+	return func(_ context.Context, logger *zap.Logger, cfg config.GenerateConfig,
+		mm mmtypes.MarketMap,
+	) (mmtypes.MarketMap, types.RemovalReasons, error) {
+		logger.Info("processing defi invert", zap.Int("num markets", len(mm.Markets)))
+		count := 0
+		for name, market := range mm.Markets {
+			for i, pc := range market.ProviderConfigs {
+				if cfg.IsProviderDefi(pc.Name) && pc.Name == gecko.ProviderNameCurve {
+					var metadata curve.CurveMetadata
+					if err := json.Unmarshal([]byte(pc.Metadata_JSON), &metadata); err != nil {
+						logger.Debug("failed to parse metadata JSON", zap.String("metadata", pc.Metadata_JSON), zap.Error(err))
+						continue
+					}
+					if pc.Invert {
+						market.ProviderConfigs[i].OffChainTicker = metadata.QuoteTokenAddress
+						count++
+					} else {
+						market.ProviderConfigs[i].OffChainTicker = metadata.BaseTokenAddress
+					}
+
+					mm.Markets[name] = market
+				}
+			}
+		}
+		logger.Info("processed defi invert", zap.Int("num markets", count))
 		return mm, nil, nil
 	}
 }

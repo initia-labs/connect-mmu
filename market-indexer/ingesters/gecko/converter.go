@@ -3,8 +3,7 @@ package gecko
 func ConvertDexName(dex string) string {
 	// Define a map to hold the conversions
 	dexMap := map[string]string{
-		"uniswap-v4":    "uniswap-v4-ethereum",
-		"curve-finance": "curve",
+		"uniswap-v4": "uniswap-v4-ethereum",
 	}
 
 	// Check if the given dex name exists in the map and return the mapped value
