@@ -40,17 +40,6 @@ func New(logger *zap.Logger) *Ingester {
 	}
 }
 
-func NewWithClient(logger *zap.Logger, client Client) *Ingester {
-	if logger == nil {
-		panic("cannot set nil logger")
-	}
-
-	return &Ingester{
-		logger: logger.With(zap.String("ingester", Name)),
-		client: client,
-	}
-}
-
 func (i *Ingester) GetProviderMarkets(ctx context.Context) ([]provider.CreateProviderMarket, error) {
 	i.logger.Info("fetching data")
 
