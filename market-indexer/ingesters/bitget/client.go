@@ -43,13 +43,13 @@ func (h *httpClient) Symbols(ctx context.Context) (BitgetSymbolsResponse, error)
 	}
 	defer resp.Body.Close()
 
-	var getInstrResp BitgetSymbolsResponse
-	if err := json.NewDecoder(resp.Body).Decode(&getInstrResp); err != nil {
+	var symbols BitgetSymbolsResponse
+	if err := json.NewDecoder(resp.Body).Decode(&symbols); err != nil {
 		h.logger.Error("failed to decode symbols", zap.Error(err))
 		return BitgetSymbolsResponse{}, err
 	}
 
-	return getInstrResp, nil
+	return symbols, nil
 }
 
 func (h *httpClient) Tickers(ctx context.Context) (BitgetTickersResponse, error) {
@@ -65,6 +65,6 @@ func (h *httpClient) Tickers(ctx context.Context) (BitgetTickersResponse, error)
 		h.logger.Error("failed to decode tickers", zap.Error(err))
 		return BitgetTickersResponse{}, err
 	}
-	
+
 	return tickers, nil
 }

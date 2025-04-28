@@ -168,7 +168,7 @@ func (tr *BitgetTickersResponse) toMap() map[string]TickerData {
 func (sd *SymbolData) toProviderMarket(tickerData TickerData) (provider.CreateProviderMarket, error) {
 	quoteVol, err := strconv.ParseFloat(tickerData.QuoteVolume, 64)
 	if err != nil {
-		return provider.CreateProviderMarket{}, err
+		return provider.CreateProviderMarket{}, fmt.Errorf("failed to convert quoteVolume: %w", err)
 	}
 	refPrice, err := strconv.ParseFloat(tickerData.LastPr, 64)
 	if err != nil {
@@ -176,11 +176,11 @@ func (sd *SymbolData) toProviderMarket(tickerData TickerData) (provider.CreatePr
 	}
 	targetBase, err := symbols.ToTickerString(sd.BaseCoin)
 	if err != nil {
-		return provider.CreateProviderMarket{}, err
+		return provider.CreateProviderMarket{}, fmt.Errorf("failed to convert base: %w", err)
 	}
 	targetQuote, err := symbols.ToTickerString(sd.QuoteCoin)
 	if err != nil {
-		return provider.CreateProviderMarket{}, err
+		return provider.CreateProviderMarket{}, fmt.Errorf("failed to convert quote: %w", err)
 	}
 
 	pm := provider.CreateProviderMarket{
