@@ -12,6 +12,7 @@ import (
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/binance"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/bitfinex"
+	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/bitget"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/bitstamp"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/bybit"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/coinbase"
@@ -95,6 +96,8 @@ func NewIndexer(cfg config.MarketConfig, logger *zap.Logger, writer provider.Sto
 			igs[i] = gecko.New(logger, cfg)
 		case osmosis.Name:
 			igs[i] = osmosis.New(logger, cfg)
+		case bitget.Name:
+			igs[i] = bitget.New(logger)
 		default:
 			return nil, fmt.Errorf("provider %s is unsupported", ingestConfig.Name)
 		}
