@@ -10,7 +10,7 @@ replace (
 	// compatibility with older version of datadog used in dydxprotocol
 	github.com/google/pprof => github.com/google/pprof v0.0.0-20210423192551-a2663126120b
 
-	github.com/skip-mev/connect/v2 => github.com/initia-labs/connect/v2 v2.3.2
+	github.com/skip-mev/connect/v2 => github.com/initia-labs/connect/v2 v2.3.3
 )
 
 require (
