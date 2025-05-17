@@ -20,6 +20,7 @@ import (
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/gate"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/gecko"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/huobi"
+	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/initia"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/kraken"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/kucoin"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/mexc"
@@ -98,6 +99,8 @@ func NewIndexer(cfg config.MarketConfig, logger *zap.Logger, writer provider.Sto
 			igs[i] = osmosis.New(logger, cfg)
 		case bitget.Name:
 			igs[i] = bitget.New(logger)
+		case initia.Name:
+			igs[i] = initia.New(logger)
 		default:
 			return nil, fmt.Errorf("provider %s is unsupported", ingestConfig.Name)
 		}

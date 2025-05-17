@@ -250,6 +250,11 @@ func (i *Indexer) GetProviderMarketsPairs(ctx context.Context, cfg config.Market
 	for name, id := range ingesterIDs {
 		i.logger.Info("fetching cmc market data", zap.String("exchange", name))
 
+		// skip initia dex, it's not supported by cmc
+		if id == 1 {
+			continue
+		}
+
 		markets, err := i.client.ExchangeMarkets(ctx, id)
 		if err != nil {
 			return pmps, err
@@ -305,8 +310,16 @@ func (i *Indexer) getIngesterMapping(ctx context.Context, cfg config.MarketConfi
 		return nil, err
 	}
 
+	// Manually insert initia dex
+	// see: https://pro-api.coinmarketcap.com/v1/exchange/map with listing_status param.
+	allExchanges := append(exchangeMapResp.Data, ExchangeIDMapData{
+		ID:       1,
+		Slug:     "initia",
+		IsActive: exchangeStatusActive,
+	})
+
 	exchangeNameToID := make(map[string]int, len(exchangeMapResp.Data))
-	for _, data := range exchangeMapResp.Data {
+	for _, data := range allExchanges {
 		if data.IsActive == exchangeStatusActive {
 			exchangeNameToID[data.Slug] = data.ID
 		}
@@ -363,7 +376,6 @@ func resolveIngesterNameAliases(ingesterName string) string {
 		return "uniswap-v3"
 	case "curve":
 		return "curve-finance"
-
 	default:
 		return ingesterName
 	}

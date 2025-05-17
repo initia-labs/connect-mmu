@@ -191,37 +191,36 @@ func (idx *Indexer) AssociateCoinMarketCap(
 			}
 
 		} else {
-			idx.logger.Debug("using asset info for CMC info",
-				zap.String("base", input.Create.TargetBase),
-				zap.String("quote", input.Create.TargetQuote),
-				zap.String("base_address", input.BaseAddress),
-				zap.String("quote_address", input.QuoteAddress),
-				zap.String("provider name", input.Create.ProviderName),
-			)
+			// Check if this pair should be skipped
+			pairKey := fmt.Sprintf("%s/%s", input.Create.TargetBase, input.Create.TargetQuote)
+			if filter.GetSkipList()[pairKey] {
+				idx.logger.Debug("skipping pair as per skip list", zap.String("pair", pairKey))
+				input.Create.BaseAssetInfoID = 0
+				input.Create.QuoteAssetInfoID = 0
+			} else {
+				idx.logger.Debug("using asset info for CMC info",
+					zap.String("base", input.Create.TargetBase),
+					zap.String("quote", input.Create.TargetQuote),
+					zap.String("base_address", input.BaseAddress),
+					zap.String("quote_address", input.QuoteAddress),
+					zap.String("provider name", input.Create.ProviderName),
+				)
 
-			// check individual assets if we cannot match a pair
-			info, ok := idx.knownAssets.LookupAssetInfo(input.Create.TargetBase, input.BaseAddress)
-			if !ok {
-				idx.logger.Debug("failed to check known base asset info for CMC info", zap.Any("input", input))
-				// Check if this pair should be skipped
-				pairKey := fmt.Sprintf("%s/%s", input.Create.TargetBase, input.Create.TargetQuote)
-				if filter.GetSkipList()[pairKey] {
-					idx.logger.Debug("skipping pair as per skip list", zap.String("pair", pairKey))
-					info = provider.AssetInfo{
-						ID: 0,
-					}
-				} else {
+				// check individual assets if we cannot match a pair
+				info, ok := idx.knownAssets.LookupAssetInfo(input.Create.TargetBase, input.BaseAddress)
+				if !ok {
+					idx.logger.Debug("failed to check known base asset info for CMC info", zap.Any("input", input))
 					continue
 				}
-			}
-			input.Create.BaseAssetInfoID = info.ID
+				input.Create.BaseAssetInfoID = info.ID
 
-			info, ok = idx.knownAssets.LookupAssetInfo(input.Create.TargetQuote, input.QuoteAddress)
-			if !ok {
-				idx.logger.Debug("failed to check known quote asset info for CMC info", zap.Any("input", input))
-				continue
+				info, ok = idx.knownAssets.LookupAssetInfo(input.Create.TargetQuote, input.QuoteAddress)
+				if !ok {
+					idx.logger.Debug("failed to check known quote asset info for CMC info", zap.Any("input", input))
+					continue
+				}
+				input.Create.QuoteAssetInfoID = info.ID
 			}
-			input.Create.QuoteAssetInfoID = info.ID
 		}
 
 		// add pair data to supplement

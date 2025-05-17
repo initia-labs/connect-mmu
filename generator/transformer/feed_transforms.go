@@ -16,6 +16,7 @@ import (
 	"github.com/skip-mev/connect-mmu/generator/filter"
 	"github.com/skip-mev/connect-mmu/generator/types"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/gecko"
+	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/initia"
 )
 
 // TransformFeed is a function that performs some transformation on the given input markets.
@@ -57,7 +58,8 @@ func NormalizeBy() TransformFeed {
 				}
 				newQuote := normPair.Quote
 
-				if feed.ProviderConfig.Name != gecko.ProviderName && feed.ProviderConfig.Name != gecko.ProviderNameCurve {
+				// exclude providers that provide price data in USD
+				if feed.ProviderConfig.Name != gecko.ProviderName && feed.ProviderConfig.Name != gecko.ProviderNameCurve && feed.ProviderConfig.Name != initia.ProviderName {
 					feed.ProviderConfig.NormalizeByPair = &normPair
 				}
 				feed.Ticker.CurrencyPair.Quote = newQuote
@@ -69,7 +71,7 @@ func NormalizeBy() TransformFeed {
 
 				// example:
 				// feed = BTC/USD provided by BTC/USDT adjusted by USDT/USD
-				// reference price ( BTC in terms of USD)
+				// reference price (BTC in terms of USD)
 				// is equal to (BTC in terms of USDT) times (USDT in terms of USD)
 				feed.ReferencePrice = new(big.Float).Mul(feed.ReferencePrice, adjustPrice)
 
