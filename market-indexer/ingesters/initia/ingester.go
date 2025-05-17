@@ -55,7 +55,7 @@ func (i *Ingester) GetProviderMarkets(ctx context.Context) ([]provider.CreatePro
 	}
 
 	denomToSymbol := registries.toMap()
-	var markets []provider.CreateProviderMarket
+	markets := make([]provider.CreateProviderMarket, 0, len(pools.Pools))
 
 	for _, pool := range pools.Pools {
 		if len(pool.Coins) != 2 {
