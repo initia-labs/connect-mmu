@@ -13,7 +13,6 @@ import (
 	"github.com/skip-mev/connect-mmu/config"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/coinbase"
 	crypto_com "github.com/skip-mev/connect-mmu/market-indexer/ingesters/crypto.com"
-	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/gate"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/gecko"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/huobi"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/names"
@@ -368,8 +367,6 @@ func resolveIngesterNameAliases(ingesterName string) string {
 		return "coinbase-exchange"
 	case crypto_com.Name:
 		return "crypto-com-exchange"
-	case gate.Name:
-		return "gate-io"
 	case huobi.Name:
 		return "htx"
 	case "uniswap_v3":
