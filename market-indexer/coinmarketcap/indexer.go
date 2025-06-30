@@ -13,7 +13,6 @@ import (
 	"github.com/skip-mev/connect-mmu/config"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/coinbase"
 	crypto_com "github.com/skip-mev/connect-mmu/market-indexer/ingesters/crypto.com"
-	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/gate"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/gecko"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/huobi"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/names"
@@ -250,6 +249,11 @@ func (i *Indexer) GetProviderMarketsPairs(ctx context.Context, cfg config.Market
 	for name, id := range ingesterIDs {
 		i.logger.Info("fetching cmc market data", zap.String("exchange", name))
 
+		// skip initia dex, it's not supported by cmc
+		if id == 1 {
+			continue
+		}
+
 		markets, err := i.client.ExchangeMarkets(ctx, id)
 		if err != nil {
 			return pmps, err
@@ -305,8 +309,16 @@ func (i *Indexer) getIngesterMapping(ctx context.Context, cfg config.MarketConfi
 		return nil, err
 	}
 
+	// Manually insert initia dex
+	// see: https://pro-api.coinmarketcap.com/v1/exchange/map with listing_status param.
+	allExchanges := append(exchangeMapResp.Data, ExchangeIDMapData{
+		ID:       1,
+		Slug:     "initia",
+		IsActive: exchangeStatusActive,
+	})
+
 	exchangeNameToID := make(map[string]int, len(exchangeMapResp.Data))
-	for _, data := range exchangeMapResp.Data {
+	for _, data := range allExchanges {
 		if data.IsActive == exchangeStatusActive {
 			exchangeNameToID[data.Slug] = data.ID
 		}
@@ -355,15 +367,12 @@ func resolveIngesterNameAliases(ingesterName string) string {
 		return "coinbase-exchange"
 	case crypto_com.Name:
 		return "crypto-com-exchange"
-	case gate.Name:
-		return "gate-io"
 	case huobi.Name:
 		return "htx"
 	case "uniswap_v3":
 		return "uniswap-v3"
 	case "curve":
 		return "curve-finance"
-
 	default:
 		return ingesterName
 	}

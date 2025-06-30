@@ -10,6 +10,7 @@ import (
 	crypto_com "github.com/skip-mev/connect-mmu/market-indexer/ingesters/crypto.com"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/gate"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/huobi"
+	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/initia"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/kraken"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/kucoin"
 	"github.com/skip-mev/connect-mmu/market-indexer/ingesters/mexc"
@@ -55,6 +56,8 @@ func GetProviderName(name string) string {
 		return osmosis.ProviderName
 	case bitget.Name:
 		return bitget.ProviderName
+	case initia.Name:
+		return initia.ProviderName
 	default:
 		return nameUnknown
 	}

@@ -3,6 +3,7 @@ package osmosis
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/skip-mev/connect-mmu/lib/symbols"
 	"github.com/skip-mev/connect-mmu/store/provider"
 	"github.com/skip-mev/connect/v2/providers/apis/defi/osmosis"
 	"strconv"
@@ -131,33 +132,46 @@ type Status struct {
 func (o *OsmosisMarketData) toProvideMarket() (provider.CreateProviderMarket, error) {
 	contractAddress, err := strconv.ParseUint(o.ContractAddress, 10, 64)
 	if err != nil {
-		return provider.CreateProviderMarket{}, fmt.Errorf("osmosis client: failed to parse contract address: %w", err)
+		return provider.CreateProviderMarket{}, fmt.Errorf("failed to parse contract address: %w", err)
 	}
-	metaData := osmosis.TickerMetadata{
+	metadata := osmosis.TickerMetadata{
 		PoolID:          contractAddress,
 		BaseTokenDenom:  o.BaseAssetContractAddress,
 		QuoteTokenDenom: o.QuoteAssetContractAddress,
 	}
 
-	metaDataBz, err := json.Marshal(metaData)
+	metadataBz, err := json.Marshal(metadata)
 	if err != nil {
-		return provider.CreateProviderMarket{}, fmt.Errorf("osmosis client: failed to marshal metadata: %w", err)
+		return provider.CreateProviderMarket{}, fmt.Errorf("failed to marshal metadata: %w", err)
+	}
+
+	targetBase, err := symbols.ToTickerString(o.BaseAssetSymbol)
+	if err != nil {
+		return provider.CreateProviderMarket{}, fmt.Errorf("failed to convert symbol to ticker string: %w", err)
+	}
+	targetQuote, err := symbols.ToTickerString(o.QuoteAssetSymbol)
+	if err != nil {
+		return provider.CreateProviderMarket{}, fmt.Errorf("failed to convert symbol to ticker string: %w", err)
 	}
 
 	providerMarket := provider.CreateProviderMarket{
 		Create: provider.CreateProviderMarketParams{
-			TargetBase:       o.BaseAssetSymbol,
-			TargetQuote:      o.QuoteAssetSymbol,
-			OffChainTicker:   o.Name,
+			TargetBase:       targetBase,
+			TargetQuote:      targetQuote,
+			OffChainTicker:   fmt.Sprintf("%s/%s", targetBase, targetQuote),
 			ProviderName:     ProviderName,
 			QuoteVolume:      o.Quote[0].Volume24H,
-			MetadataJSON:     metaDataBz,
+			MetadataJSON:     metadataBz,
 			ReferencePrice:   o.Quote[0].Price,
 			NegativeDepthTwo: o.Quote[0].Liquidity / 2,
 			PositiveDepthTwo: o.Quote[0].Liquidity / 2,
 		},
 		BaseAddress:  o.BaseAssetContractAddress,
 		QuoteAddress: o.QuoteAssetContractAddress,
+	}
+
+	if err := providerMarket.ValidateBasic(); err != nil {
+		return provider.CreateProviderMarket{}, fmt.Errorf("failed to validate provider market: %w", err)
 	}
 
 	return providerMarket, nil

@@ -14,14 +14,16 @@
       { "name": "okx" },
       { "name": "mexc" },
       { "name": "gecko_terminal" },
-      { "name": "osmosis" }
+      { "name": "osmosis" },
+      { "name": "bitget" },
+      { "name": "initia" }
     ],
     "coinmarketcap": { "api_key": "" },
-    "coingecko": {"api_key": ""},
+    "coingecko": { "api_key": "" },
     "raydium": null,
     "gecko_network_dex_pairs": [
       { "network": "eth", "dex": "uniswap_v3" },
-      { "network": "eth", "dex": "curve"}
+      { "network": "eth", "dex": "curve" }
     ]
   },
   "generate": {
@@ -157,6 +159,20 @@
         "ignore_liquidity": true,
         "ignore_volume": false,
         "is_defi": true
+      },
+      "bitget_ws": {
+        "isSupplemental": false,
+        "require_aggregate_ids": false,
+        "filters": { "top_markets": 0 },
+        "ignore_liquidity": false,
+        "ignore_volume": false
+      },
+      "initia_api": {
+        "isSupplemental": false,
+        "require_aggregate_ids": false,
+        "filters": { "top_markets": 0 },
+        "ignore_liquidity": true,
+        "ignore_volume": true
       }
     },
     "quotes": {
@@ -208,6 +224,11 @@
         "min_provider_volume": 5,
         "min_provider_liquidity": 500,
         "normalize_by_pair": "OSMO/USD"
+      },
+      "INIT": {
+        "min_provider_volume": 5,
+        "min_provider_liquidity": 500,
+        "normalize_by_pair": "INIT/USD"
       }
     },
     "min_cex_provider_count": 1,
